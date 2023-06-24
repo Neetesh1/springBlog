@@ -6,6 +6,7 @@ import com.blog.app.blog.payloads.Userdto;
 
 public interface UserService {
 
+    Userdto registerNewUser(Userdto userdto);
     Userdto createuser(Userdto userdto);
     Userdto updateuser(Userdto userdto , int userid);
     Userdto getuserById(int userid);

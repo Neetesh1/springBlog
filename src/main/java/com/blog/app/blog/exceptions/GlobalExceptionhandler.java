@@ -29,5 +29,14 @@ public class GlobalExceptionhandler {
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse> badCredentialsException(BadCredentialsException ex){
+
+        String message = ex.getMessage();
+        ApiResponse apiResponse = new ApiResponse(message, false);
+        return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.NOT_FOUND);
+
+    }
     
 }

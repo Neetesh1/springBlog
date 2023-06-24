@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blog.app.blog.exceptions.BadCredentialsException;
 import com.blog.app.blog.payloads.JwtAuthRequest;
 import com.blog.app.blog.payloads.JwtAuthResponse;
+import com.blog.app.blog.payloads.Userdto;
 import com.blog.app.blog.security.JwtTokenHelper;
+import com.blog.app.blog.services.UserService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -29,6 +31,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager   authenticationManager;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> createToken(
@@ -51,9 +56,18 @@ public class AuthController {
             this.authenticationManager.authenticate(authenticationToken);
 
         }
-        catch (DisabledException e){
-            throw new DisabledException("USER_DISABLED", e);
+        catch (Exception e){
+            System.out.println("Invalid Credentials");
+            throw new BadCredentialsException(username, password);
         }
         
     }
+
+    //register new user api
+    @PostMapping("/register")
+    public ResponseEntity<Userdto> registerUser(@RequestBody Userdto userdto){
+        Userdto createdUserDto = this.userService.registerNewUser(userdto);
+        return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
+    }
+
 }
